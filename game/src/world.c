@@ -1,11 +1,14 @@
 #pragma once
+#include "world.h"
 #include "body.h"
+
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
 
 lllBody* lllBodies = NULL;
 int lllBodyCount = 0;
+Vector2 lllGravity;
 
  lllBody* CreateBody() {
 	 lllBody* body = (lllBody*)malloc(sizeof(lllBody));

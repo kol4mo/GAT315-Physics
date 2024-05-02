@@ -1,4 +1,5 @@
 #include "integrator.h"
+#include "body.h"
 #include "world.h"
 #include "raylib.h"
 #include "mathf.h"
@@ -14,6 +15,9 @@ int main(void)
 	InitWindow(1280, 720, "particles");
 	SetTargetFPS(60);
 
+	//initialize world
+	lllGravity = (Vector2){ 0, 30 };
+
 	//game loop
 	while (!WindowShouldClose())
 	{
@@ -26,7 +30,11 @@ int main(void)
 			lllBody* body = CreateBody();
 			body->position = position;
 			body->mass = GetRandomFloatValue(1, 10);
-			ApplyForce(body, CreateVector2(GetRandomFloatValue(-50, 50), GetRandomFloatValue(-50, 50)));
+			body->inverseMass = 1 / body->mass;
+			body->bodyType = BT_DYNAMIC;
+			body->damping = GetRandomFloatValue01();
+			body->gravityScale = 5;
+			//ApplyForce(body, CreateVector2(GetRandomFloatValue(-100, 100), GetRandomFloatValue(-100, 100)), FM_VELOCITY);
 		}
 
 		//apply foce
@@ -34,7 +42,7 @@ int main(void)
 		while (body) // do while we have a valid pointer, will be NULL at the end of the list
 		{
 			// update body position
-			ApplyForce(body, CreateVector2(0, -5000));
+			//ApplyForce(body, lllGravity, FM_FORCE);
 			body = body->next; // get next body
 		}
 
@@ -43,8 +51,7 @@ int main(void)
 		while (body) // do while we have a valid pointer, will be NULL at the end of the list
 		{
 			// update body position
-			ExplicitEuler(body, dt);
-			ClearForce(body);
+			Step(body, dt);
 			body = body->next; // get next body
 		}
 
