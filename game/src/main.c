@@ -1,4 +1,4 @@
-#include "body.h"
+#include "integrator.h"
 #include "world.h"
 #include "raylib.h"
 #include "mathf.h"
@@ -14,8 +14,6 @@ int main(void)
 	InitWindow(1280, 720, "particles");
 	SetTargetFPS(60);
 
-	int bodyCount = 0;
-
 	//game loop
 	while (!WindowShouldClose())
 	{
@@ -25,10 +23,29 @@ int main(void)
 
 		Vector2 position = GetMousePosition();
 		if (IsMouseButtonDown(0)) {
-			Body* body = CreateBody();
+			lllBody* body = CreateBody();
 			body->position = position;
-			body->velocity = CreateVector2(GetRandomFloatValue(-5, 5), GetRandomFloatValue(-5, 5));
-			bodyCount++;
+			body->mass = GetRandomFloatValue(1, 10);
+			ApplyForce(body, CreateVector2(GetRandomFloatValue(-50, 50), GetRandomFloatValue(-50, 50)));
+		}
+
+		//apply foce
+		lllBody* body = lllBodies;
+		while (body) // do while we have a valid pointer, will be NULL at the end of the list
+		{
+			// update body position
+			ApplyForce(body, CreateVector2(0, -5000));
+			body = body->next; // get next body
+		}
+
+		//update Bodies
+		body = lllBodies;
+		while (body) // do while we have a valid pointer, will be NULL at the end of the list
+		{
+			// update body position
+			ExplicitEuler(body, dt);
+			ClearForce(body);
+			body = body->next; // get next body
 		}
 
 		//Render
@@ -42,13 +59,12 @@ int main(void)
 		DrawCircle((int)position.x, (int)position.y, 10, YELLOW);
 		//DrawCircle((int)position.x, (int)position.y, 5, BLACK);
 		//DrawCircleLines((int)position.x, (int)position.y, 10, YELLOW);
-		Body* body = bodies;
+		//draw bodies
+		body = lllBodies;
 		while (body) // do while we have a valid pointer, will be NULL at the end of the list
 		{
-			// update body position
-			body->position = Vector2Add(body->position, body->velocity);
 			// draw body
-			DrawCircle((int)(body->position.x), (int)body->position.y, 10, RED);
+			DrawCircle((int)(body->position.x), (int)body->position.y, body->mass, RED);
 
 			body = body->next; // get next body
 		}
@@ -58,6 +74,6 @@ int main(void)
 
 
 	CloseWindow();
-	free(bodies);
+	free(lllBodies);
 	return 0;
 }

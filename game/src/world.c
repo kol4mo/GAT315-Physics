@@ -2,24 +2,27 @@
 #include "body.h"
 #include <stdlib.h>
 #include <assert.h>
+#include <string.h>
 
-Body* bodies = NULL;
-int bodyCount = 0;
+lllBody* lllBodies = NULL;
+int lllBodyCount = 0;
 
- Body* CreateBody() {
-	 Body* body = (Body*)malloc(sizeof(Body));
+ lllBody* CreateBody() {
+	 lllBody* body = (lllBody*)malloc(sizeof(lllBody));
 	 assert(body);
+
+	 memset(body, 0, sizeof(lllBody));
 	 body->prev = NULL;
-	 body->next = bodies;
-	 if (bodies) {
-		 bodies->prev = body;
+	 body->next = lllBodies;
+	 if (lllBodies) {
+		 lllBodies->prev = body;
 	 }
-	 bodies = body;
-	 bodyCount++;
+	 lllBodies = body;
+	 lllBodyCount++;
 
 	 return body;
 }
- void DestroyBody(Body* body) {
+ void DestroyBody(lllBody* body) {
 	 assert(body);
 	 if (body->prev) {
 		 body->prev->next = body->next;
@@ -27,9 +30,9 @@ int bodyCount = 0;
 	 if (body->next) {
 		 body->next->prev = body->prev;
 	 }
-	 if (body == bodies) {
-		 bodies = body->next;
+	 if (body == lllBodies) {
+		 lllBodies = body->next;
 	 }
-	 bodyCount--;
+	 lllBodyCount--;
 	 free(body);
 }
