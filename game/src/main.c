@@ -1,4 +1,4 @@
-#pragma once
+
 #include "integrator.h"
 #include "body.h"
 #include "world.h"
@@ -16,11 +16,11 @@
 int main(void)
 {
 	InitWindow(1280, 720, "particles");
+	InitEditor();
 	SetTargetFPS(60);
 
 	//initialize world
 	lllGravity = (Vector2){ 0, 0 };
-
 	//game loop
 	while (!WindowShouldClose())
 	{
@@ -44,7 +44,7 @@ int main(void)
 			{
 				lllBody* body = CreateBody();
 				body->position = ConvertScreenToWorld(position);
-				body->mass = GetRandomFloatValue(0.1f, 1);
+				body->mass = GetRandomFloatValue(nceditorData.MassMinValue, nceditorData.MassMaxValue);
 				body->inverseMass = 1 / body->mass;
 				body->bodyType = BT_DYNAMIC;
 				body->damping = 0;
@@ -56,7 +56,7 @@ int main(void)
 		}
 
 		//apply foce
-		ApplyGravitation(lllBodies, 10);
+		ApplyGravitation(lllBodies, nceditorData.GravitationValue);
 		
 
 		//update Bodies
@@ -69,7 +69,6 @@ int main(void)
 		BeginDrawing();
 		ClearBackground(BLACK);
 
-		DrawEditor();
 		//stats
 		DrawText(TextFormat("FPS: %.2f (ms %.2fms)", fps, 1000 / fps), 10, 10, 20, LIME);
 		DrawText(TextFormat("FRAME: %.4f", dt), 10, 30, 20, LIME);
@@ -85,6 +84,7 @@ int main(void)
 
 			// get next body
 		}
+		DrawEditor();
 
 		EndDrawing();
 	}

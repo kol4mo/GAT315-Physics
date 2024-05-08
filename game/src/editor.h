@@ -1,6 +1,14 @@
 #pragma once
 #include "raylib.h"
 
+typedef struct ncEditorData {
+	float MassMinValue;
+	float MassMaxValue;
+	float GravitationValue;
+}ncEditorData_t;
+
+extern ncEditorData_t nceditorData;
+
 extern bool ncEditorActive;
 extern bool ncEditorIntersect;
 
