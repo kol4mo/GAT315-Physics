@@ -21,7 +21,7 @@ typedef struct lllBody {
 	Vector2 velocity;
 	Vector2 acceleration;
 	Vector2 force;
-
+	Color* color;
 	float mass;
 	float inverseMass; // 1/mass (static = 0)
 	float gravityScale;
