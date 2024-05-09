@@ -42,15 +42,12 @@ int main(void)
 			Vector2 angle = getVector2FromAngle(GetRandomFloatValue(0, 360) * DEG2RAD);
 			for (int i = 0; i < 1; i++)
 			{
-				lllBody* body = CreateBody();
-				body->position = ConvertScreenToWorld(position);
-				body->mass = GetRandomFloatValue(nceditorData.MassMinValue, nceditorData.MassMaxValue);
-				body->inverseMass = 1 / body->mass;
-				body->bodyType = BT_DYNAMIC;
+				lllBody* body = CreateBody(ConvertScreenToWorld(position), nceditorData.MassMinValue, BT_DYNAMIC);
 				body->damping = 0;
 				body->gravityScale = 5;
 				body->color = fireworkColor;
 
+				AddBody(body);
 				//ApplyForce(body, Vector2Scale(angle, GetRandomFloatValue(-2, 2)), FM_IMPULSE);
 			}
 		}
@@ -84,7 +81,7 @@ int main(void)
 
 			// get next body
 		}
-		DrawEditor();
+		DrawEditor(position);
 
 		EndDrawing();
 	}

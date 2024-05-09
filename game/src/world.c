@@ -10,21 +10,34 @@ lllBody* lllBodies = NULL;
 int lllBodyCount = 0;
 Vector2 lllGravity;
 
- lllBody* CreateBody() {
+ lllBody* CreateBody(Vector2 position, float mass, lllBodyType bodyType) {
 	 lllBody* body = (lllBody*)malloc(sizeof(lllBody));
 	 assert(body);
 
 	 memset(body, 0, sizeof(lllBody));
+	 body->position = position;
+	 body->mass = mass;
+
+	 body->inverseMass = (bodyType == BT_DYNAMIC) ? 1 / mass : 0;
+	 body->bodyType = bodyType;
+	 //add element to linked list
+
+
+	 return body;
+}
+ void AddBody(lllBody* body)
+ {
+	 assert(body);
+
 	 body->prev = NULL;
 	 body->next = lllBodies;
-	 if (lllBodies) {
+	 if (lllBodies != NULL) {
 		 lllBodies->prev = body;
 	 }
 	 lllBodies = body;
 	 lllBodyCount++;
+ }
 
-	 return body;
-}
  void DestroyBody(lllBody* body) {
 	 assert(body);
 	 if (body->prev) {

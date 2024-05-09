@@ -8,5 +8,7 @@ extern lllBody* lllBodies;
 extern int lllBodyCount;
 extern Vector2 lllGravity;
 
-lllBody* CreateBody();
+lllBody* CreateBody(Vector2 position, float mass, lllBodyType bodyType);
+void AddBody(lllBody* body);
 void DestroyBody(lllBody* body);
+void DestroyAllBody(lllBody* body);
