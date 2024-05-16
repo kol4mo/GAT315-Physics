@@ -39,14 +39,13 @@ inline void ApplyForce(lllBody_t* body, Vector2 force, lllForceMode forceMode) {
 		return;
 	}
 
-	switch (forceMode)
-	{
+	switch (forceMode) {
 	case FM_FORCE:
 		body->force = Vector2Add(body->force, force);
 		break;
 	case FM_IMPULSE:
 		//applys a sudden change in momentum
-		body->velocity = Vector2Scale(force, body->inverseMass);
+		body->velocity = Vector2Add(body->velocity, Vector2Scale(force, body->inverseMass));
 		break;
 	case FM_VELOCITY:
 		body->velocity = force;

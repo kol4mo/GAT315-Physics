@@ -39,16 +39,16 @@ int main(void)
 		float fps = (float)GetFPS();
 
 		Vector2 position = GetMousePosition();
-
+		lllGravity = (Vector2){ 0 , -nceditorData.GravitationValue };
 		ncScreenZoom = Clamp(ncScreenZoom, 0.1f, 10);
 		ncScreenZoom += GetMouseWheelMove() * 0.2f;
 		UpdateEditor(position);
 		selectedBody = getBodyIntersect(lllBodies, position);
 		if (selectedBody) {
 			Vector2 screen = ConvertWorldToScreen(selectedBody->position);
-			DrawCircleLines(screen.x, screen.y, ConvertWorldToPixel(selectedBody->mass) + 5, RED);
+			DrawCircleLines(screen.x, screen.y, ConvertWorldToPixel(selectedBody->mass * 0.5f) + 5, RED);
 		}
-		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) || (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && IsKeyDown(KEY_LEFT_SHIFT))) {
 			Color* fireworkColor = (Color*)malloc(sizeof(Color));
 			fireworkColor->r = GetRandomFloatValue(0, 255);
 			fireworkColor->g = GetRandomFloatValue(0, 255);
@@ -57,10 +57,11 @@ int main(void)
 			Vector2 angle = getVector2FromAngle(GetRandomFloatValue(0, 360) * DEG2RAD);
 			for (int i = 0; i < 1; i++)
 			{
-				lllBody_t* body = CreateBody(ConvertScreenToWorld(position), nceditorData.MassMinValue, BT_DYNAMIC);
+				lllBody_t* body = CreateBody(ConvertScreenToWorld(position), nceditorData.MassMinValue, nceditorData.BodyTypeActive);
 				body->damping = nceditorData.Damping;
 				body->gravityScale = 5;
 				body->color = fireworkColor;
+				body->restitution = 0.8f;
 
 				AddBody(body);
 				//ApplyForce(body, Vector2Scale(angle, GetRandomFloatValue(-2, 2)), FM_IMPULSE);
@@ -87,6 +88,8 @@ int main(void)
 
 		ncContact_t* contacts = NULL;
 		CreateContacts(lllBodies, &contacts);
+		SeparateContacts(contacts);
+		ResolveContacts(contacts);
 		
 		//Render
 		BeginDrawing();
@@ -107,7 +110,7 @@ int main(void)
 		for (lllBody_t* body = lllBodies; body; body = body->next) { // do while we have a valid pointer, will be NULL at the end of the list
 			// draw body
 			Vector2 screen = ConvertWorldToScreen(body->position);
-			DrawCircle((int)(screen.x), (int)screen.y, ConvertWorldToPixel(body->mass), *body->color);
+			DrawCircle((int)(screen.x), (int)screen.y, ConvertWorldToPixel(body->mass * 0.5f), *body->color);
 
 			// get next body
 		}
@@ -116,7 +119,7 @@ int main(void)
 			// draw body
 			
 			Vector2 screen = ConvertWorldToScreen(contact->body1->position);
-			DrawCircle((int)(screen.x), (int)screen.y, ConvertWorldToPixel(contact->body1->mass), RED);
+			DrawCircle((int)(screen.x), (int)screen.y, ConvertWorldToPixel(contact->body1->mass * 0.5f), RED);
 
 			// get next body
 		}
