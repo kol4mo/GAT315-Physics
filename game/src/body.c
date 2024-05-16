@@ -3,7 +3,7 @@
 #include "integrator.h"
 #include "world.h"
 
-void Step(lllBody* body, float timestep) {
+void Step(lllBody_t* body, float timestep) {
 	body->force = Vector2Add(body->force, Vector2Scale(Vector2Scale(lllGravity, body->gravityScale), body->mass));
 	body->acceleration = Vector2Scale(body->force, body->inverseMass);
 

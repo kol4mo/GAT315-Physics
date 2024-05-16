@@ -6,15 +6,15 @@
 #include <assert.h>
 #include <string.h>
 
-lllBody* lllBodies = NULL;
+lllBody_t* lllBodies = NULL;
 int lllBodyCount = 0;
 Vector2 lllGravity;
 
- lllBody* CreateBody(Vector2 position, float mass, lllBodyType bodyType) {
-	 lllBody* body = (lllBody*)malloc(sizeof(lllBody));
+ lllBody_t* CreateBody(Vector2 position, float mass, lllBodyType bodyType) {
+	 lllBody_t* body = (lllBody_t*)malloc(sizeof(lllBody_t));
 	 assert(body);
 
-	 memset(body, 0, sizeof(lllBody));
+	 memset(body, 0, sizeof(lllBody_t));
 	 body->position = position;
 	 body->mass = mass;
 
@@ -25,7 +25,7 @@ Vector2 lllGravity;
 
 	 return body;
 }
- void AddBody(lllBody* body)
+ void AddBody(lllBody_t* body)
  {
 	 assert(body);
 
@@ -38,7 +38,7 @@ Vector2 lllGravity;
 	 lllBodyCount++;
  }
 
- void DestroyBody(lllBody* body) {
+ void DestroyBody(lllBody_t* body) {
 	 assert(body);
 	 if (body->prev) {
 		 body->prev->next = body->next;

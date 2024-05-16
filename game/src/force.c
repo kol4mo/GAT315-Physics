@@ -2,10 +2,10 @@
 #include "force.h"
 #include "body.h"
 #include "mathf.h"
-void ApplyGravitation(lllBody* bodies, float strength) {
-	for (lllBody* body1 = bodies; body1; body1 = body1->next)
+void ApplyGravitation(lllBody_t* bodies, float strength) {
+	for (lllBody_t* body1 = bodies; body1; body1 = body1->next)
 	{
-		for (lllBody* body2 = bodies; body2; body2 = body2->next)
+		for (lllBody_t* body2 = bodies; body2; body2 = body2->next)
 		{
 			if (body1 == body2) {
 				continue;

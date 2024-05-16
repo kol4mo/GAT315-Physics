@@ -27,12 +27,14 @@ typedef struct lllBody {
 	float gravityScale;
 	float damping;
 
+	float restitution;
+
 	struct lllBody* next;
 	struct lllBody* prev;
 
-}lllBody;
+}lllBody_t;
 
-inline void ApplyForce(lllBody* body, Vector2 force, lllForceMode forceMode) {
+inline void ApplyForce(lllBody_t* body, Vector2 force, lllForceMode forceMode) {
 	if (body->bodyType != BT_DYNAMIC) {
 		return;
 	}
@@ -52,8 +54,8 @@ inline void ApplyForce(lllBody* body, Vector2 force, lllForceMode forceMode) {
 	}
 }
 
-inline void ClearForce(lllBody* body) {
+inline void ClearForce(lllBody_t* body) {
 	body->force = Vector2Zero();
 }
 
-void Step(lllBody* body, float timestep);
+void Step(lllBody_t* body, float timestep);
