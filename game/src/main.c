@@ -29,6 +29,9 @@ int main(void)
 	HideCursor();
 	SetTargetFPS(60);
 
+	float fixedTimeStep = 1.0f / 50;
+	float timeAccumulator = 0;
+
 	//initialize world
 	//lllGravity = (Vector2){ 0, 0 };
 	//game loop
@@ -77,20 +80,25 @@ int main(void)
 			}
 		}
 
-		//apply foce
-		//ApplyGravitation(lllBodies, nceditorData.GravitationValue);
-		ApplySpringForce(lllSprings);
+		timeAccumulator += dt;
 
-		//update Bodies
-		for (lllBody_t* body = lllBodies; body; body = body->next) {
-			Step(body, dt);
+		while (timeAccumulator >= fixedTimeStep) {
+
+			timeAccumulator -= fixedTimeStep;
+			//apply foce
+			ApplyGravitation(lllBodies, nceditorData.GravitationValue);
+			ApplySpringForce(lllSprings);
+
+			//update Bodies
+			for (lllBody_t* body = lllBodies; body; body = body->next) {
+				Step(body, fixedTimeStep);
+			}
+
+			ncContact_t* contacts = NULL;
+			CreateContacts(lllBodies, &contacts);
+			SeparateContacts(contacts);
+			ResolveContacts(contacts);
 		}
-
-		ncContact_t* contacts = NULL;
-		CreateContacts(lllBodies, &contacts);
-		SeparateContacts(contacts);
-		ResolveContacts(contacts);
-		
 		//Render
 		BeginDrawing();
 		ClearBackground(BLACK);
@@ -117,7 +125,7 @@ int main(void)
 
 		for (ncContact_t* contact = contacts; contact; contact = contact->next) { // do while we have a valid pointer, will be NULL at the end of the list
 			// draw body
-			
+
 			Vector2 screen = ConvertWorldToScreen(contact->body1->position);
 			DrawCircle((int)(screen.x), (int)screen.y, ConvertWorldToPixel(contact->body1->mass * 0.5f), RED);
 
