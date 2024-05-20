@@ -81,7 +81,7 @@ int main(void)
 		}
 
 		timeAccumulator += dt;
-
+		ncContact_t* contacts = NULL;
 		while (timeAccumulator >= fixedTimeStep) {
 
 			timeAccumulator -= fixedTimeStep;
@@ -94,7 +94,7 @@ int main(void)
 				Step(body, fixedTimeStep);
 			}
 
-			ncContact_t* contacts = NULL;
+			contacts = NULL;
 			CreateContacts(lllBodies, &contacts);
 			SeparateContacts(contacts);
 			ResolveContacts(contacts);
