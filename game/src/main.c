@@ -29,20 +29,24 @@ int main(void)
 	HideCursor();
 	SetTargetFPS(60);
 
-	float fixedTimeStep = 1.0f / 50;
 	float timeAccumulator = 0;
+		lllBody_t* Cursorbody = CreateBody(ConvertScreenToWorld(GetMousePosition()), nceditorData.MassMinValue, nceditorData.BodyTypeActive);
+		ncSpring_t* cursorspring = NULL;
 
+		Cursorbody->damping = nceditorData.Damping;
+		Cursorbody->gravityScale = nceditorData.GravityScale;
+		Cursorbody->restitution = nceditorData.Restitution;
 	//initialize world
-	//lllGravity = (Vector2){ 0, 0 };
 	//game loop
 	while (!WindowShouldClose())
 	{
 		//update
 		float dt = GetFrameTime();
 		float fps = (float)GetFPS();
-
+		float fixedTimeStep = 1.0f / nceditorData.TimeStep;
 		Vector2 position = GetMousePosition();
-		lllGravity = (Vector2){ 0 , -nceditorData.GravitationValue };
+		Cursorbody->position = ConvertScreenToWorld(position);
+		lllGravity = (Vector2){ 0 , -nceditorData.GravityValue };
 		ncScreenZoom = Clamp(ncScreenZoom, 0.1f, 10);
 		ncScreenZoom += GetMouseWheelMove() * 0.2f;
 		UpdateEditor(position);
@@ -62,42 +66,61 @@ int main(void)
 			{
 				lllBody_t* body = CreateBody(ConvertScreenToWorld(position), nceditorData.MassMinValue, nceditorData.BodyTypeActive);
 				body->damping = nceditorData.Damping;
-				body->gravityScale = 5;
+				body->gravityScale = nceditorData.GravityScale;
 				body->color = fireworkColor;
-				body->restitution = 0.8f;
+				body->restitution = nceditorData.Restitution;
 
 				AddBody(body);
 				//ApplyForce(body, Vector2Scale(angle, GetRandomFloatValue(-2, 2)), FM_IMPULSE);
 			}
 		}
+		if (IsKeyReleased(KEY_LEFT_ALT)) {
+			DestroySpring(cursorspring);
+		}
+		if (IsKeyDown(KEY_LEFT_ALT)) {
+			if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT) && selectedBody) {
+				cursorspring = CreateSpring(Cursorbody, selectedBody, Vector2Distance(Cursorbody->position, selectedBody->position), nceditorData.Stiffness);
+				AddSpring(cursorspring);
+			}
 
-		if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT) && selectedBody) connectBody = selectedBody;
-		if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT) && connectBody) DrawLineBodyToPosition(connectBody, position);
-		if (IsMouseButtonReleased(MOUSE_BUTTON_RIGHT) && connectBody) {
-			if (selectedBody && selectedBody != connectBody) {
-				ncSpring_t* spring = CreateSpring(connectBody, selectedBody, Vector2Distance(connectBody->position, selectedBody->position) / 2, 20);
-				AddSpring(spring);
+		}
+		else {
+			if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT) && selectedBody) connectBody = selectedBody;
+			if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT) && connectBody) DrawLineBodyToPosition(connectBody, position);
+			if (IsMouseButtonReleased(MOUSE_BUTTON_RIGHT) && connectBody) {
+				if (selectedBody && selectedBody != connectBody) {
+					ncSpring_t* spring = CreateSpring(connectBody, selectedBody, Vector2Distance(connectBody->position, selectedBody->position), nceditorData.Stiffness);
+					AddSpring(spring);
+				}
 			}
 		}
 
-		timeAccumulator += dt;
 		ncContact_t* contacts = NULL;
-		while (timeAccumulator >= fixedTimeStep) {
+		if (nceditorData.simulateToggle) {
+			timeAccumulator += dt;
+			while (timeAccumulator >= fixedTimeStep) {
 
-			timeAccumulator -= fixedTimeStep;
-			//apply foce
-			ApplyGravitation(lllBodies, nceditorData.GravitationValue);
-			ApplySpringForce(lllSprings);
+				timeAccumulator -= fixedTimeStep;
+				//apply foce
+				ApplyGravitation(lllBodies, nceditorData.GravitationValue);
+				ApplySpringForce(lllSprings);
 
-			//update Bodies
-			for (lllBody_t* body = lllBodies; body; body = body->next) {
-				Step(body, fixedTimeStep);
+				//update Bodies
+				for (lllBody_t* body = lllBodies; body; body = body->next) {
+					Step(body, fixedTimeStep);
+				}
+
+				contacts = NULL;
+				CreateContacts(lllBodies, &contacts);
+				SeparateContacts(contacts);
+				ResolveContacts(contacts);
 			}
+		}
 
+		if (nceditorData.resetButton) {
+			lllBodies = NULL;
+			lllSprings = NULL;
 			contacts = NULL;
-			CreateContacts(lllBodies, &contacts);
-			SeparateContacts(contacts);
-			ResolveContacts(contacts);
 		}
 		//Render
 		BeginDrawing();

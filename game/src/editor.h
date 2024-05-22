@@ -10,6 +10,12 @@ typedef struct ncEditorData {
     int BodyTypeActive;
     float GravityValue;
     float Damping;
+    float TimeStep;
+    float GravityScale;
+    float Stiffness;
+    float Restitution;
+    bool simulateToggle;
+    bool resetButton;
 }ncEditorData_t;
 
 extern ncEditorData_t nceditorData;

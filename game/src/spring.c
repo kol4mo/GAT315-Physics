@@ -34,6 +34,7 @@ void AddSpring(ncSpring_t* spring)
 }
 
 void DestroySpring(ncSpring_t* spring) {
+	if (spring == NULL) return;
 	assert(spring);
 	if (spring->prev) {
 		spring->prev->next = spring->next;
